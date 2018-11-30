@@ -26,7 +26,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', {useNewUrlParser: true}
         // });
 
         db.collection('Todos').find({
-            text: 'Something to do'
+            text: 'only one left'
         }).toArray().then((docs) => {
             console.log('Todos:');
             console.log(JSON.stringify(docs, undefined, 2));
