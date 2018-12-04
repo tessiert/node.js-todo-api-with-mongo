@@ -50,7 +50,7 @@ app.get('/todos/:id', (request, response) => {
 
 
 app.listen(3000, () => {
-    console.log(`Server listening on port ${PORT}`);
+    console.log(`Server listening on port ${port}`);
 });
 
 module.exports = {app};
