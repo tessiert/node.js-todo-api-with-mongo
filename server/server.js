@@ -35,7 +35,7 @@ app.get('/todos/:id', (request, response) => {
     var id = request.params.id;
 
     if (!ObjectID.isValid(id)) {
-        return response.status(404).send();
+        return response.status(400).send();
     }
 
     Todo.findById(id).then((todo) => {
@@ -58,10 +58,8 @@ app.delete('/todos/:id', (request, response) => {
         if (!todo) {
             return response.status(404).send();
         }
-        return response.send(todo);
-    }).catch((error) => {
-        return response.status(400).send();
-    });
+        return response.send({todo});
+    })
 });
 
 

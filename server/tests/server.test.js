@@ -91,16 +91,55 @@ describe('GET /todos/:id', () => {
         var new_id = new ObjectID();
 
         request(app)
-            .get(`/todos/${new_id.toHexString}`)
+            .get(`/todos/${new_id.toHexString()}`)
             .expect(404)
             .end(done);
     });
 
-    it('should return 404 for invalid IDs', (done) => {
+    it('should return 400 for invalid ID', (done) => {
         request(app)
             .get('/todos/123')
+            .expect(400)
+            .end(done);
+    });
+});
+
+describe('DELETE /todos/:id', () => {
+    it('should remove a todo', (done) => {
+        var id = test_todos[1]._id.toHexString();
+
+        request(app)
+        .delete(`/todos/${id}`)
+        .expect(200)
+        .expect((response) => {
+            expect(response.body.todo._id).toBe(id);
+        })
+        .end((error, response) => {
+            if (error) {
+                return done(error);
+            }
+
+            Todo.findById(id).then((todo) => {
+                expect(todo).toBeFalsy();
+                done();
+            }).catch((error) => done(error));
+        });
+    });
+
+    it('should return 404 if todo not found', (done) => {
+        var new_id = new ObjectID();
+
+        request(app)
+            .delete(`/todos/${new_id.toHexString()}`)
             .expect(404)
             .end(done);
+    });
+
+    it('should return 400 for invalid ID', (done) => {
+        request(app)
+        .delete('/todos/123')
+        .expect(400)
+        .end(done);
     });
 });
 
