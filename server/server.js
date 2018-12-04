@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
@@ -11,6 +12,7 @@ const port = process.env.PORT || 3000; // PORT var needed for heroku deployment
 
 app.use(bodyParser.json());
 
+
 app.post('/todos/', (request, response) => {
     var todo = new Todo({
         text: request.body.text
@@ -23,6 +25,7 @@ app.post('/todos/', (request, response) => {
     });
 });
 
+
 app.get('/todos/', (request, response) => {
     Todo.find().then((todos) => {
         return response.send({todos});
@@ -30,6 +33,7 @@ app.get('/todos/', (request, response) => {
         return response.status(400).send(error);
     });
 });
+
 
 app.get('/todos/:id', (request, response) => {
     var id = request.params.id;
@@ -48,6 +52,7 @@ app.get('/todos/:id', (request, response) => {
     });
 });
 
+
 app.delete('/todos/:id', (request, response) => {
     var id = request.params.id;
 
@@ -59,6 +64,37 @@ app.delete('/todos/:id', (request, response) => {
             return response.status(404).send();
         }
         return response.send({todo});
+    }).catch((error) => {
+        return response.status(400).send();
+    });
+});
+
+
+app.patch('/todos/:id', (request, response) => {
+    var id = request.params.id;
+    // Constrain which properties user is allowed to modify
+    var body = _.pick(request.body, ['text', 'completed']);
+
+    if (!ObjectID.isValid(id)) {
+        return response.status(400).send();
+    }
+
+    if (_.isBoolean(body.completed) && body.completed) {
+        body.completedAt = new Date().getTime();
+    }
+    else {
+        body.completed = false;
+        body.completedAt = null;
+    }
+
+    Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+        if (!todo) {
+            return response.status(404).send();
+        }
+
+        return response.send({todo});
+    }).catch((error) => {
+        return response.status(400).send();
     })
 });
 
