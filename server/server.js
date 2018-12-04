@@ -7,6 +7,7 @@ const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 
 var app = express();
+const port = process.env.PORT || 3000; // PORT var needed for heroku deployment
 
 app.use(bodyParser.json());
 
@@ -49,7 +50,7 @@ app.get('/todos/:id', (request, response) => {
 
 
 app.listen(3000, () => {
-    console.log('Server listening on port 3000');
+    console.log(`Server listening on port ${PORT}`);
 });
 
 module.exports = {app};
