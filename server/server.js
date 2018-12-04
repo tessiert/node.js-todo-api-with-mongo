@@ -49,7 +49,7 @@ app.get('/todos/:id', (request, response) => {
 });
 
 
-app.listen(3000, () => {
+app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
 
