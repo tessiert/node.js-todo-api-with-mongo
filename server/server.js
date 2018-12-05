@@ -1,3 +1,5 @@
+require('./config/config');
+
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -8,7 +10,7 @@ const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 
 var app = express();
-const port = process.env.PORT || 3000; // PORT var needed for heroku deployment
+const port = process.env.PORT; // PORT var needed for heroku deployment
 
 app.use(bodyParser.json());
 
