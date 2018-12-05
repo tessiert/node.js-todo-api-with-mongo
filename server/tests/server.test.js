@@ -10,7 +10,9 @@ const test_todos = [{
     text: 'First test todo'
 }, {
     _id: new ObjectID(),
-    text: 'Second test todo'
+    text: 'Second test todo',
+    completed: true,
+    completedAt: 123
 }];
 
 // Before each test, reset db to contain only those docs in test_todos array
@@ -140,6 +142,44 @@ describe('DELETE /todos/:id', () => {
         .delete('/todos/123')
         .expect(400)
         .end(done);
+    });
+});
+
+describe('PATCH /todos/:id', () => {
+    it('should update the todo', (done) => {
+        var id = test_todos[0]._id.toHexString();
+        var updates = {
+            text: 'New Text',
+            completed: true
+        }
+
+        request(app)
+            .patch(`/todos/${id}`)
+            .send(updates)
+            .expect(200)
+            .expect((response) => {
+                expect(response.body.todo.text).toBe(updates.text);
+                expect(response.body.todo.completed).toBe(true);
+                expect(typeof response.body.todo.completedAt).toBe('number');
+            }).end(done);
+    });
+
+    it('should clear completedAt when completed field is set to false', (done) => {
+        var id = test_todos[1]._id.toHexString();
+        var updates = {
+            text: 'Other New Text',
+            completed: false
+        }
+
+        request(app)
+            .patch(`/todos/${id}`)
+            .send(updates)
+            .expect(200)
+            .expect((response) => {
+                expect(response.body.todo.text).toBe(updates.text);
+                expect(response.body.todo.completed).toBe(false);
+                expect(response.body.todo.completedAt).toBe(null);               
+            }).end(done);
     });
 });
 
