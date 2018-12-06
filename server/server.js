@@ -14,7 +14,7 @@ const port = process.env.PORT; // PORT var needed for heroku deployment
 
 app.use(bodyParser.json());
 
-
+// todos routes
 app.post('/todos/', (request, response) => {
     var todo = new Todo({
         text: request.body.text
@@ -22,7 +22,7 @@ app.post('/todos/', (request, response) => {
 
     todo.save().then((doc) => {
         return response.send(doc);
-    }, (error) => {
+    }).catch((error) => {
         return response.status(400).send(error);
     });
 });
@@ -31,7 +31,7 @@ app.post('/todos/', (request, response) => {
 app.get('/todos/', (request, response) => {
     Todo.find().then((todos) => {
         return response.send({todos});
-    }, (error) => {
+    }).catch((error) => {
         return response.status(400).send(error);
     });
 });
@@ -101,6 +101,21 @@ app.patch('/todos/:id', (request, response) => {
 });
 
 
+// users routes
+app.post('/users/', (request, response) => {
+    var body = _.pick(request.body, ['email', 'password']);
+    var user = new User(body);
+
+    user.save().then(() => {
+        return user.generateAuthToken();
+    }).then((token) => {
+        return response.header('x-auth', token).send(user);
+    }).catch((error) => {
+        return response.status(400).send(error);
+    });
+});
+
+// web server
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });
