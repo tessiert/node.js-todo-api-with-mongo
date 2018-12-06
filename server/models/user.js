@@ -32,6 +32,26 @@ var UserSchema = new mongoose.Schema({
     }]
 });
 
+
+// Create model methods
+UserSchema.statics.findByToken = function (token) {
+    var User = this;    // 'this' binding is the model
+    var decoded;        // initially 'undefined' since jwt throws error if verify fails
+
+    try {
+        decoded = jwt.verify(token, 'abc123');
+    }
+    catch (error) {
+        return Promise.reject();
+    }
+
+    return User.findOne({
+        '_id': decoded._id,         // quotes optional for _id, but required
+        'tokens.token': token,      // for keys with '.'
+        'tokens.access': 'auth'
+    });
+};
+
 // Create instance methods
 UserSchema.methods.toJSON = function () {
     var user = this;
@@ -39,6 +59,7 @@ UserSchema.methods.toJSON = function () {
 
     return _.pick(userObject, ['_id', 'email']);
 };
+
 
 UserSchema.methods.generateAuthToken = function () {
     var user = this;
@@ -53,7 +74,8 @@ UserSchema.methods.generateAuthToken = function () {
     });
 };
 
-// Create User data model
+
+// Create User data model from schema
 var User = mongoose.model('User', UserSchema);
 
 module.exports = {User};
